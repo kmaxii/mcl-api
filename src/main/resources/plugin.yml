@@ -1,0 +1,21 @@
+name: mclapi
+version: '${version}'
+main: me.kmaxi.mclapi.Mclapi
+api-version: '1.17'
+# Commands section
+commands:
+  api:
+
+  api set_stat_entry:
+      description: Set a player's stat entry
+  api get_stat_entry:
+    description: Fetch data from event_stats table
+  api reset_game_number:
+    description: Reset the internal game_number counter.
+  api incremement_game_number:
+    description: increment the internal game_number counter.
+  api set_winner:
+    description: Set winning team
+
+
+
