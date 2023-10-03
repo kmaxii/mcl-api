@@ -44,12 +44,11 @@ public class EventStatsHandler {
         preparedStatement.setInt(3, GameNumberHandler.getGameNumber());
 
         // Execute the query
-        ResultSet resultSet = preparedStatement.executeQuery();
-        return resultSet;
+        return preparedStatement.executeQuery();
     }
 
 
-    public static void updateStat(String minecraftId, String statType, int value) {
+    public static void updateStat(String minecraftId, String statType, int value, int gameID) {
         try {
 
             int eventId = GameNumberHandler.getEventId();
@@ -57,7 +56,7 @@ public class EventStatsHandler {
                 return;
             }
 
-            PreparedStatement preparedStatement = getUpdatePrepareStatement(minecraftId, statType, value, eventId);
+            PreparedStatement preparedStatement = getUpdatePrepareStatement(minecraftId, statType, value, eventId, gameID);
 
             // Execute the update
             int rowsAffected = preparedStatement.executeUpdate();
@@ -69,9 +68,9 @@ public class EventStatsHandler {
                 System.out.println("No rows were updated. Minecraft ID or event/game details may not exist.");
 
                 switch (statType) {
-                    case "stars" -> insertNewEntry(minecraftId, value, 0, 0);
-                    case "kills" -> insertNewEntry(minecraftId, 0, value, 0);
-                    case "deaths" -> insertNewEntry(minecraftId, 0, 0, value);
+                    case "stars" -> insertNewEntry(minecraftId, value, 0, 0, gameID);
+                    case "kills" -> insertNewEntry(minecraftId, 0, value, 0, gameID);
+                    case "deaths" -> insertNewEntry(minecraftId, 0, 0, value, gameID);
                     default -> {
                     }
                 }
@@ -83,23 +82,24 @@ public class EventStatsHandler {
         }
     }
 
-    private static PreparedStatement getUpdatePrepareStatement(String minecraftId, String statType, int value, int eventId) throws SQLException {
+    private static PreparedStatement getUpdatePrepareStatement(String minecraftId, String statType, int value, int eventId, int gameID) throws SQLException {
         Connection connection = DataBaseManager.getInstance().getConnection();
 
         // Define the SQL query to update the specified statistic
-        String updateQuery = "UPDATE event_stats SET " + statType + " = ? " +
+        String updateQuery = "UPDATE event_stats SET " + statType + " = ?, game_id = ? " +
                 "WHERE minecraft_id = ? AND event_id = ? AND game_number = ?";
 
         // Create a prepared statement
         PreparedStatement preparedStatement = connection.prepareStatement(updateQuery);
         preparedStatement.setInt(1, value);
-        preparedStatement.setString(2, minecraftId);
-        preparedStatement.setInt(3, eventId);
-        preparedStatement.setInt(4, GameNumberHandler.getGameNumber());
+        preparedStatement.setInt(2, gameID); // Set the game_id parameter
+        preparedStatement.setString(3, minecraftId);
+        preparedStatement.setInt(4, eventId);
+        preparedStatement.setInt(5, GameNumberHandler.getGameNumber());
         return preparedStatement;
     }
 
-    private static void insertNewEntry(String minecraftId, int stars, int kills, int deaths) {
+    private static void insertNewEntry(String minecraftId, int stars, int kills, int deaths, int gameID) {
         try {
             int eventId = GameNumberHandler.getEventId();
             if (eventId == 0){
@@ -111,8 +111,8 @@ public class EventStatsHandler {
 
 
             // Define the SQL query for inserting a new entry
-            String insertQuery = "INSERT INTO event_stats (minecraft_id, event_id, game_number, stars, kills, deaths) " +
-                    "VALUES (?, ?, ?, ?, ?, ?)";
+            String insertQuery = "INSERT INTO event_stats (minecraft_id, event_id, game_number, stars, kills, deaths, game_id) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
             // Create a prepared statement
             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
@@ -122,6 +122,7 @@ public class EventStatsHandler {
             preparedStatement.setInt(4, stars);
             preparedStatement.setInt(5, kills);
             preparedStatement.setInt(6, deaths);
+            preparedStatement.setInt(7, gameID);
 
             // Execute the insert
             int rowsAffected = preparedStatement.executeUpdate();
