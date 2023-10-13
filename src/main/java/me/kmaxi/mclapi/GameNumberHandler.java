@@ -15,26 +15,6 @@ import java.sql.SQLException;
 public class GameNumberHandler {
 
 
-    private static int gameNumber = 0;
-
-    public static boolean increaseNumber() {
-
-        gameNumber++;
-
-        return true;
-    }
-
-    public static boolean resetNumber() {
-
-        gameNumber = 0;
-
-        return true;
-    }
-
-    public static int getGameNumber() {
-        return gameNumber;
-    }
-
     public static int getEventId() {
         try {
             // Define the URL

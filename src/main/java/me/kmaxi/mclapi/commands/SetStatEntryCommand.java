@@ -9,8 +9,8 @@ public class SetStatEntryCommand {
     public static boolean onCommand(CommandSender sender, String[] args) {
 
 
-        if (args.length != 5) {
-            sender.sendMessage("Invalid arguments. Usage: /api set_stat_entry <player_uuid> <stat_type> <value> <game_id>");
+        if (args.length != 6) {
+            sender.sendMessage("Invalid arguments. Usage: /api set_stat_entry <player_uuid> <stat_type> <value> <game_id> <game number>");
             return true;
         }
 
@@ -20,6 +20,8 @@ public class SetStatEntryCommand {
         String valeAsString = args[3];
 
         String gameIdAsString = args[4];
+
+        String gameNumberAsString = args[5];
 
         int value = getInt(valeAsString, sender);
         if (value == Integer.MAX_VALUE) {
@@ -31,8 +33,13 @@ public class SetStatEntryCommand {
             return true;
         }
 
+        int gameNumber = getInt(gameNumberAsString, sender);
+        if (gameNumber == Integer.MAX_VALUE) {
+            return true;
+        }
 
-        EventStatsHandler.updateStat(playerUuid, statType, value, gameId);
+
+        EventStatsHandler.updateStat(playerUuid, statType, value, gameId, gameNumber);
 
 
         sender.sendMessage("Updated stats");
@@ -40,7 +47,7 @@ public class SetStatEntryCommand {
         return true;
     }
 
-    private static int getInt(String s, CommandSender sender) {
+    static int getInt(String s, CommandSender sender) {
         int value;
 
         if (s.matches("[0-9]+")) {
